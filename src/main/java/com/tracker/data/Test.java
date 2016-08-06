@@ -30,6 +30,10 @@ public class Test {
             this.id = id;
             this.setStr(rs.getString("str"));
             exists = true;
+
+            rs.close();
+            stmt.close();
+            connection.close();
         }
         catch(SQLException sqle){
             sqle.printStackTrace();
@@ -51,6 +55,9 @@ public class Test {
                     this.id = rs.getInt(1);
                     exists = true;
                 }
+                rs.close();
+                preparedStatement.close();
+                connection.close();
             }
             catch(SQLException sqle){
                 sqle.printStackTrace();
@@ -73,6 +80,8 @@ public class Test {
                 preparedStatement.setString(1,this.getStr());
                 preparedStatement.setInt(2,this.getId());
                 preparedStatement.executeUpdate();
+                preparedStatement.close();
+                connection.close();
             }
             catch(SQLException sqle){
                 sqle.printStackTrace();
@@ -94,6 +103,8 @@ public class Test {
                 preparedStatement.setInt(1,this.getId());
                 preparedStatement.executeUpdate();
                 exists = false;
+                preparedStatement.close();
+                connection.close();
             }
             catch(SQLException sqle){
                 sqle.printStackTrace();

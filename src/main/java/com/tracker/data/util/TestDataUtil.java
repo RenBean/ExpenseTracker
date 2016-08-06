@@ -23,6 +23,9 @@ public class TestDataUtil {
                 Test t = new Test(rs.getInt("id"));
                 tests.add(t);
             }
+            rs.close();
+            stmt.close();
+            connection.close();
         }
         catch(SQLException sqle){
             sqle.printStackTrace();

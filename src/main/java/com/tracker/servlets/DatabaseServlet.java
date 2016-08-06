@@ -30,13 +30,16 @@ public class DatabaseServlet extends HttpServlet {
             cpds.setPassword(PASS);
             connectionPool = cpds;
             System.out.println("NOTE: DATABASE CONNECTION POOL STARTED");
-            testInitalLoad();
+            //dropExpenseTable();
+            expenseInitialLoad();
+            //testInitialLoad();
         }
         catch (PropertyVetoException pve)
         {
             pve.printStackTrace();
         }
     }
+
 
     public static Connection getConnection()
     {
@@ -51,14 +54,14 @@ public class DatabaseServlet extends HttpServlet {
         }
     }
 
-    private void testInitalLoad() {
+    private void testInitialLoad() {
         try {
             Connection connection = DatabaseServlet.getConnection();
             if(connection != null) {
-                Statement stmt = connection.createStatement();
+                Statement statement = connection.createStatement();
                 String query = "SELECT * FROM test";
-                ResultSet rs = stmt.executeQuery(query);
-                rs.next();
+                ResultSet result = statement.executeQuery(query);
+                result.next();
             } else {
                 System.out.println("ERROR: connection is NULL");
             }
@@ -81,8 +84,8 @@ public class DatabaseServlet extends HttpServlet {
         Connection connection = DatabaseServlet.getConnection();
         if(connection != null) {
             System.out.println("========= sqlExpression: "+sqlExpression);
-            Statement stmt = connection.createStatement();
-            int i = stmt.executeUpdate(sqlExpression);
+            Statement statement = connection.createStatement();
+            int i = statement.executeUpdate(sqlExpression);
             if (i == -1) {
                 System.out.println("ERROR: database error in update "+sqlExpression);
             }
@@ -90,6 +93,43 @@ public class DatabaseServlet extends HttpServlet {
             System.out.println("ERROR: connection is NULL");
         }
     }
+
+    private void expenseInitialLoad() {
+        try {
+            Connection connection = DatabaseServlet.getConnection();
+            if(connection != null) {
+                Statement statement = connection.createStatement();
+                String query = "SELECT * FROM expTable";
+                ResultSet result = statement.executeQuery(query);
+                result.next();
+            } else {
+                System.out.println("ERROR: connection is NULL");
+            }
+        }
+        catch(SQLException sqle){
+            try {
+                System.out.println("CREATING DATABASE, CREATING TABLE");
+                update("CREATE TABLE expTable (id INTEGER IDENTITY PRIMARY KEY, expName VARCHAR(20), expAmount INTEGER, expDate DATE, expCategory VARCHAR(40))");
+                update("INSERT INTO expTable (expName,expAmount,expDate,expCategory) VALUES('Test1',100,CURRENT_DATE,'MEAL')");
+                update("INSERT INTO expTable (expName,expAmount,expDate,expCategory) VALUES('Test2',500,CURRENT_DATE,'TOOLS')");
+                update("INSERT INTO expTable (expName,expAmount,expDate,expCategory) VALUES('Test3',1000,CURRENT_DATE,'UTILITIES')");
+                System.out.println("TABLE CREATED");
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void dropExpenseTable() {
+        try {
+            update("DROP TABLE expTable");
+            System.out.println("TABLE DROPPED");
+        }
+        catch(SQLException sqle){
+            System.out.println("DROP TABLE FAIL");
+        }
+    }
+
 
     public void destroy()
     {
